@@ -29,38 +29,47 @@ function getMemberList(callback) {
 function hightlight_memberName() {
     $("div.talk_info").each(function() {
         var tag_nick = $(this).children("strong");
-        var tag_bubble = $(this).children(".bubble");
+        var tag_bubble = $(this).children(".bubble")
+        .css("font-size", "12px");
         var nick = tag_nick.text();
         if (nick == role.subManager) {
             tag_nick.css("color", "blue")
-        };
-        if (nick == role.bot) {
+            .text("[부매니저] " + nick);
+        }else if (nick == role.bot) {
             tag_bubble
-            .css("color", "white")
-            .css("background-color", "#3d3d3d");
+            .css("color", "#034036")
+            .css("background-color", "#00deb9");
+        }else {
+            tag_bubble.css("background-color", "#f2f2f2");
         }
 
+        tag_bubble.children("p.txt").each(function() {
+            var text = $(this).text();
+
+            // replace tag
+            let tag_color = "rgba(0, 144, 252, 0.5)"
+            if (nick == role.bot) tag_color = "rgba(255, 255, 255, 0.3)";
+            var replaceTagText = function(ref) {
+                if (ref.includes("<tag:\"")) {
+                    var targ = ref.split("<tag:\"")[1].split("\">")[0];
+                    var tagName = `<tag:\"${targ}\">`;
+                    targ = `<span style="background-color: ${tag_color}"><b>#${targ}</b></span> `;
+                    var replaced = ref.replace(tagName, targ);
+                    return replaceTagText(replaced);
+                } else return ref;
+            };
+            if (text.includes("<tag:\"")) {
+                
+                let a = replaceTagText(text);
+                $(this).html(a);
+            }
+        });
         
     });
 }
 
 function config_chatbubble() {
-    $("div.bubble > p.txt").each(function() {
-        var text = $(this).text();
-        var replaceTagText = function(ref) {
-            if (ref.includes("<tag:\"")) {
-                var targ = ref.split("<tag:\"")[1].split("\">")[0];
-                var tagName = `<tag:\"${targ}\">`;
-                targ = `<span style="background-color: #42f5a7;">#${targ}</span> `;
-                var replaced = ref.replace(tagName, targ);
-                return replaceTagText(replaced);
-            } else return ref;
-        };
-        if (text.includes("<tag:\"")) {
-            let a = replaceTagText(text);
-            $(this).html(a);
-        }
-    });
+    
 }
 
 function newChat(callback) {
