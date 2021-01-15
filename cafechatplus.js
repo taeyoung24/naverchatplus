@@ -75,7 +75,7 @@ function newChat(callback) {
     }, 1000);
 }
 
-// newChat()
+// newChat().
 
 var timer_j = setInterval(function() {
     hightlight_memberName();
