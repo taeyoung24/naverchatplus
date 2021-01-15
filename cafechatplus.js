@@ -40,42 +40,53 @@ function getMemberList(callback) {
 let lastChatSender = "";
 let lastChatEle = null;
 
-function hightlight_memberName() {
+function convert_chats(eleList) {
     let delList = [];
-    $("div.talk_info").each(function() {
-        var tag_nick = $(this).children("strong");
-        var senderId = $(this).closest("li.log_friend").attr('targetid');
-        var tag_bubble = $(this).children("div.bubble")
-        .css("font-size", "12px");
+    eleList.forEach(function(ele_v) {
+        var ele_chat = $(ele_v).find("div.talk_info");
+        var ele_nick = $(ele_chat).children("strong"); 
+        var senderId = $(ele_v).attr('targetid');
+        var ele_bubble = ele_chat.children("div.bubble")
+        .css("font-size", "12px")
+        .hover(() => {
+            $(ele_chat).children("div.bubble").animate({
+                boxShadow: "5px 5px 14px rgba(0, 0, 0, 0.16)"
+            });
+            // $(this).children("div.bubble").css("box-shadow", "5px 5px 14px rgba(0, 0, 0, 0.16)");
+        }, () => {
+            $(ele_chat).children("div.bubble").css("box-shadow", "");
+        });
 
-        if ($(this).find("img").length == 0) {
+        if ($(ele_chat).find("img").length == 0) {
             if (senderId == lastChatSender) {
-                let msgHtml = tag_bubble.html();
+                let msgHtml = ele_bubble.html();
                 lastChatEle.find("div.bubble").append(msgHtml);
-                delList.push($(this).closest("li"));
+                delList.push($(ele_v));
                 return true;
             } else {
                 lastChatSender = senderId;
-                lastChatEle = $(this).closest("li");
+                lastChatEle = $(ele_v);
             }
+        } else {
+            lastChatSender = "";
+            lastChatEle = null;
         }
         
 
-        var nick = tag_nick.text();
+        var nick = ele_nick.text();
         if (senderId == role.subManager.id) {
-            tag_nick.css("color", "#fc0050").html(`<span>${role.subManager.nick}</span><span style="border:1px solid; border-radius: 4em; margin-left: 4px; font-size: 4px; padding: 1px 5px">부매니저</span>`);
+            ele_nick.css("color", "#fc0050").html(`<span>${role.subManager.nick}</span><span style="border:1px solid; border-radius: 4em; margin-left: 4px; font-size: 4px; padding: 1px 5px">부매니저</span>`);
         }else if (nick == role.bot) {
-            tag_bubble
+            ele_bubble
             .css("color", "#034036")
             .css("background-color", "#00deb9");
         }else {
-            if ($(this).find("img").length == 0) {
-                tag_bubble.css("background-color", "#f2f2f2");
+            if ($(ele_chat).find("img").length == 0) {
+                ele_bubble.css("background-color", "#f2f2f2");
             }
-            
         }
 
-        tag_bubble.children("p.txt").each(function() {
+        ele_bubble.children("p.txt").each(function() {
             var text = $(this).text();
 
             // replace tag
@@ -85,7 +96,7 @@ function hightlight_memberName() {
                 if (ref.includes("<tag:\"")) {
                     var targ = ref.split("<tag:\"")[1].split("\">")[0];
                     var tagName = `<tag:\"${targ}\">`;
-                    targ = `<span style="background-color: ${tag_color}"><b>#${targ}</b></span> `;
+                    targ = `<span style="background-color: ${tag_color}; border-radius: 4em; margin-left: 4px; font-size: 0.9em; padding: 3px 5px"><b>#${targ}</b></span>`;
                     var replaced = ref.replace(tagName, targ);
                     return replaceTagText(replaced);
                 } else return ref;
@@ -96,34 +107,35 @@ function hightlight_memberName() {
             }
         });
         
+        $(ele_chat).attr("isconverted", "true");
     });
     delList.forEach(v => v.remove());
 }
 
-function config_chatbubble() {
-    
-}
 
 function newChat(callback) {
     var chatLen = 0;
     var timer_main = setInterval(function() {
         var newChatLen = $("div.talk_info").length;
         if (chatLen != newChatLen) {
-            console.log(newChatLen - chatLen);
             chatLen = newChatLen;
-            // callback();
+            let retl = [];
+            $("div.talk_info").each((i, v) => {
+                if (!$(v).is("isconverted")) {
+                    retl.push($(v).closest("li"));
+                }
+            });
+            if (retl.length > 0) callback(retl);
         }
-    }, 1000);
+    }, 10);
 }
 
-// newChat();
+newChat(convert_chats);
 
-var timer_j = setInterval(function() {
-    hightlight_memberName();
-    config_chatbubble();
-    $("#thumb_text").appendTo("ul.list_talk");
-    $(".list_talk > li").css("padding", "4px 0");
-}, 10);
+// var timer_j = setInterval(function() {
+//     $("#thumb_text").appendTo("ul.list_talk");
+//     $(".list_talk > li").css("padding", "4px 0");
+// }, 10);
 
 var isWriting = false;
 
