@@ -64,8 +64,18 @@ function config_chatbubble() {
 }
 
 function newChat(callback) {
-    var timer_main
+    var chatLen = 0;
+    var timer_main = setInterval(function() {
+        var newChatLen = $("div.talk_info").length;
+        if (chatLen != newChatLen) {
+            console.log(newChatLen - chatLen);
+            chatLen = newChatLen;
+            callback();
+        }
+    }, 1000);
 }
+
+// newChat()
 
 var timer_j = setInterval(function() {
     hightlight_memberName();
@@ -75,7 +85,7 @@ var timer_j = setInterval(function() {
 
 var isWriting = false;
 
-// console.log($.cookie());
+// console.log($.cookie()); /
     
 var btn_sendmsg = $(".btn_attach.btn_send");
 var textbox = $("#msgInputArea");
@@ -93,6 +103,8 @@ $("ul.list_talk").append(`<li id="thumb_text" class="log_my">
             </li>`);
 $("#thumb_text").hide();
 $("div.cont_chat").css("scroll-behavior", "smooth");
+$("a.btn_attach.btn_more").click(() => {$("span.link_form > label").click()});
+
 
 function KeyBoardInputEvent(e) {
     // if (isWriting) {
