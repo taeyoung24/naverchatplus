@@ -125,7 +125,7 @@ function KeyBoardInputEvent(e) {
     // }
 
     if (e.keyCode == 49) {
-        btn_sendmsg.get(0).click();
+        // btn_sendmsg.get(0).click();
     }
     if (e.key == "@" && e.shiftKey) {
         getMemberList(data => {
