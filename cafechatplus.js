@@ -70,22 +70,23 @@ function newChat(callback) {
         if (chatLen != newChatLen) {
             console.log(newChatLen - chatLen);
             chatLen = newChatLen;
-            callback();
+            // callback();
         }
     }, 1000);
 }
 
-// newChat().
+// newChat();
 
 var timer_j = setInterval(function() {
     hightlight_memberName();
     config_chatbubble();
     $("#thumb_text").appendTo("ul.list_talk");
+    $(".list_talk > li").css("padding", "2px 0");
 }, 10);
 
 var isWriting = false;
 
-// console.log($.cookie()); /
+// console.log($.cookie());
     
 var btn_sendmsg = $(".btn_attach.btn_send");
 var textbox = $("#msgInputArea");
